@@ -1,0 +1,67 @@
+<?php
+
+$hostname = "localhost";
+$username = "Bharath";
+$password = "10125";
+$database = "tbf_data";
+
+// Create connection
+$conn = mysqli_connect($hostname, $username, $password, $database);
+
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+echo "Database OK\n";
+
+// Current date in ddmmyy format
+$date = date('dmy');
+$tableName = "data_" . $date;
+
+// Checking if table exists, create it if not exist
+$tableCheckQuery = "SHOW TABLES LIKE '$tableName'";
+$tableCheckResult = mysqli_query($conn, $tableCheckQuery);
+
+if (mysqli_num_rows($tableCheckResult) == 0) {
+    $createTableQuery = "
+        CREATE TABLE `$tableName` (
+            `ID` INT AUTO_INCREMENT PRIMARY KEY,
+            `vibration` FLOAT,
+            `noise` FLOAT,
+            `voltage` FLOAT,
+            `current` FLOAT,
+            `rpm` FLOAT,
+            `temperature` FLOAT,
+            `efficiency` FLOAT,
+            `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ";
+
+    if (!mysqli_query($conn, $createTableQuery)) {
+        die("Error creating table: " . mysqli_error($conn));
+    }
+    echo "Table '$tableName' created successfully.\n";
+}
+
+// Assume all the parameters are set and validate them
+$vibration = isset($_POST["vibration"]) ? mysqli_real_escape_string($conn, $_POST["vibration"]) : 0;
+$noise = isset($_POST["noise"]) ? mysqli_real_escape_string($conn, $_POST["noise"]) : 0;
+$voltage = isset($_POST["voltage"]) ? mysqli_real_escape_string($conn, $_POST["voltage"]) : 0;
+$current = isset($_POST["current"]) ? mysqli_real_escape_string($conn, $_POST["current"]) : 0;
+$rpm = isset($_POST["rpm"]) ? mysqli_real_escape_string($conn, $_POST["rpm"]) : 0;
+$temperature = isset($_POST["temperature"]) ? mysqli_real_escape_string($conn, $_POST["temperature"]) : 0;
+$efficiency = isset($_POST["efficiency"]) ? mysqli_real_escape_string($conn, $_POST["efficiency"]) : 0;
+
+// Insert data into MySQL database
+$sql = "INSERT INTO `$tableName` (vibration, noise, voltage, current, rpm, temperature, efficiency)
+        VALUES ('$vibration', '$noise', '$voltage', '$current', '$rpm', '$temperature', '$efficiency')";
+
+if (!mysqli_query($conn, $sql)) {
+    echo "Error: " . $sql . "\n" . mysqli_error($conn);
+} else {
+    echo "New record created successfully\n";
+}
+
+// Close connection
+mysqli_close($conn);
+?>
