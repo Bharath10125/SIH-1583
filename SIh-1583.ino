@@ -56,13 +56,13 @@ void loop() {
     }
 
     // Send data via HTTP POST
-    String postData = "voltage=" + String(voltage) +
-                      "&current=" + String(current) +
+    String postData = "vibration=" + String(vibration) +
                       "&noise=" + String(noise) +
+                      "&voltage=" + String(voltage) +
+                      "&current=" + String(current) +
+                      "&rpm=" + String(rpm) +
                       "&temperature=" + String(temperature) +
-                      "&vibration=" + String(vibration) +
-                      "&efficiency=" + String(efficiency) +
-                      "&rpm=" + String(rpm);
+                      "&efficiency=" + String(efficiency);
     
     HTTPClient http;
     http.begin(URL);
@@ -77,13 +77,13 @@ void loop() {
     http.end();
 
     // Publish sensor data to MQTT
+    client.publish("iotfrontier/vibration", String(vibration).c_str());
+    client.publish("iotfrontier/noise", String(noise).c_str());
     client.publish("iotfrontier/voltage", String(voltage).c_str());
     client.publish("iotfrontier/current", String(current).c_str());
-    client.publish("iotfrontier/noise", String(noise).c_str());
-    client.publish("iotfrontier/temperature", String(temperature).c_str());
-    client.publish("iotfrontier/vibration", String(vibration).c_str());
-    client.publish("iotfrontier/efficiency", String(efficiency).c_str());
     client.publish("iotfrontier/rpm", String(rpm).c_str());
+    client.publish("iotfrontier/temperature", String(temperature).c_str());
+    client.publish("iotfrontier/efficiency", String(efficiency).c_str());
 
     delay(5000);  // Wait for 5 seconds before the next loop
 }
